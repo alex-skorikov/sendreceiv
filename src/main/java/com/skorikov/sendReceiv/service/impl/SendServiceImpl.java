@@ -17,7 +17,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.util.Arrays;
 
@@ -49,17 +48,12 @@ public class SendServiceImpl implements SendService {
     private String signingAlgorithm;
 
     static {
-        //for localhost testing only
         javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
-                new javax.net.ssl.HostnameVerifier(){
-
-                    public boolean verify(String hostname,
-                                          javax.net.ssl.SSLSession sslSession) {
-                        if (hostname.equals("localhost")) {
-                            return true;
-                        }
-                        return false;
+                (hostname, sslSession) -> {
+                    if (hostname.equals("localhost")) {
+                        return true;
                     }
+                    return false;
                 });
     }
 
@@ -81,11 +75,11 @@ public class SendServiceImpl implements SendService {
             HttpEntity<String> request =
                     new HttpEntity<>(payload, headers);
 
-            restTemplate.exchange(sendDocumentUrl, HttpMethod.POST, request, PayloadDto.class);
-            return ResponseEntity.ok().body("Send document.");
+            restTemplate.exchange(sendDocumentUrl, HttpMethod.POST, request, String.class);
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body("Send document.");
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.badRequest().body("Can't send document.");
+            return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body("Can't send document.");
         }
     }
 

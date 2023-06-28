@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -42,21 +43,18 @@ public class UploadServiceImpl implements UploadService {
     public ResponseEntity<String> uploadDocument(HttpServletRequest request, PayloadDto payloadDto) {
         try {
             PrivateKey privateKey = keyService.getPrivateKey(keyStorage, keyStorePassword.toCharArray(), keyStoreType, alias);
-            String sign = request.getHeader("sign");
-            byte[] bytes = sign.getBytes();
-            String payload = objectMapper.writeValueAsString(payloadDto);
-            byte[] messageBytes = payload.getBytes();
+            byte[] bytes = payloadDto.toString().getBytes();
             byte[] encryptedMessageHash = keyService.decipher(bytes, hashingAlgorithm, privateKey);
             PublicKey publicKey = keyService.getPublicKey(keyStorage, keyStorePassword.toCharArray(), keyStoreType, alias);
-            boolean isCorrect = keyService.verifyDecipher(messageBytes, hashingAlgorithm, publicKey, encryptedMessageHash);
+            boolean isCorrect = keyService.verifyDecipher(bytes, hashingAlgorithm, publicKey, encryptedMessageHash);
             if (!isCorrect) {
-                return ResponseEntity.badRequest().body("Can't upload document.");
+                return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body("Can't upload document.");
             } else {
-                return ResponseEntity.ok().body("Upload document.");
+                return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body("Upload document.");
             }
         } catch (Exception ex) {
             log.error(ex.getMessage());
-            return ResponseEntity.badRequest().body("Can't upload document.");
+            return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body("Can't upload document.");
         }
     }
 }

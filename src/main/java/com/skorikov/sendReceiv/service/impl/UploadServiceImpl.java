@@ -14,15 +14,16 @@ import org.springframework.stereotype.Service;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Base64;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class UploadServiceImpl implements UploadService {
 
-    private final ObjectMapper objectMapper;
     private final KeyService keyService;
     private final String keyStorage = "src/main/resources/sendreceiv.pfx";
+    private final ObjectMapper objectMapper;
 
     @Value(value = "${server.ssl.key-store-password}")
     private String keyStorePassword;
@@ -42,13 +43,19 @@ public class UploadServiceImpl implements UploadService {
     @Override
     public ResponseEntity<String> uploadDocument(HttpServletRequest request, PayloadDto payloadDto) {
         try {
+            String sign = request.getHeader("sign");
+            // дешифрование подписи
+            byte[] decodeKey = Base64.getDecoder().decode(sign);
+
             PrivateKey privateKey = keyService.getPrivateKey(keyStorage, keyStorePassword.toCharArray(), keyStoreType, alias);
-            byte[] bytes = payloadDto.toString().getBytes();
-            byte[] encryptedMessageHash = keyService.decipher(bytes, hashingAlgorithm, privateKey);
             PublicKey publicKey = keyService.getPublicKey(keyStorage, keyStorePassword.toCharArray(), keyStoreType, alias);
-            boolean isCorrect = keyService.verifyDecipher(bytes, hashingAlgorithm, publicKey, encryptedMessageHash);
-            if (!isCorrect) {
-                return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body("Can't upload document.");
+            String payload = objectMapper.writeValueAsString(payloadDto);
+            byte[] bytes = payload.getBytes();
+            byte[] decipher = keyService.decipher(bytes, hashingAlgorithm, privateKey);
+            boolean verifyDecipher = keyService.verifyDecipher(bytes, hashingAlgorithm, publicKey, decipher);
+            boolean verifySign = keyService.verifySign(bytes, signingAlgorithm, publicKey, decodeKey);
+            if (!verifySign || !verifyDecipher) {
+                return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body("Can't verify upload document.");
             } else {
                 return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body("Upload document.");
             }

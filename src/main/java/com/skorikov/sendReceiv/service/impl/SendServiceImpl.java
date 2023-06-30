@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.security.PrivateKey;
-import java.util.Arrays;
+import java.util.Base64;
 
 @Slf4j
 @Service
@@ -65,16 +65,18 @@ public class SendServiceImpl implements SendService {
         try {
             String payload = objectMapper.writeValueAsString(document);
             PrivateKey privateKey = keyService.getPrivateKey(keyStorage, keyStorePassword.toCharArray(), keyStoreType, alias);
+
             byte[] messageBytes = payload.getBytes();
-            byte[] digitalSignature = keyService.sign(messageBytes, signingAlgorithm, privateKey);
+            // подпись документа
+            byte[] sign = keyService.sign(messageBytes, signingAlgorithm, privateKey);
+            // шифрование подписи
+            String stringKeyEncode = Base64.getEncoder().encodeToString(sign);
+
             HttpHeaders headers = new HttpHeaders();
-            assert digitalSignature != null;
-            headers.set("sign", Arrays.toString(digitalSignature));
+            headers.set("sign", stringKeyEncode);
             headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
-            HttpEntity<String> request =
-                    new HttpEntity<>(payload, headers);
-
+            HttpEntity<String> request = new HttpEntity<>(payload, headers);
             restTemplate.exchange(sendDocumentUrl, HttpMethod.POST, request, String.class);
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body("Send document.");
         } catch (Exception e) {

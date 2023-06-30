@@ -6,8 +6,10 @@ import org.bouncycastle.asn1.x509.DigestInfo;
 import org.springframework.stereotype.Service;
 import org.bouncycastle.operator.DefaultDigestAlgorithmIdentifierFinder;
 import org.bouncycastle.operator.DigestAlgorithmIdentifierFinder;
+import org.springframework.util.ResourceUtils;
 
 import javax.crypto.Cipher;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -25,13 +27,15 @@ public class KeyService {
 
     public PrivateKey getPrivateKey(String file, char[] password, String storeType, String alias) throws Exception {
         KeyStore keyStore = KeyStore.getInstance(storeType);
-        keyStore.load(new FileInputStream(file), password);
+        File storeFile = ResourceUtils.getFile(file);
+        keyStore.load(new FileInputStream(storeFile), password);
         return (PrivateKey) keyStore.getKey(alias, password);
     }
 
     public PublicKey getPublicKey(String file, char[] password, String storeType, String alias) throws Exception {
         KeyStore keyStore = KeyStore.getInstance(storeType);
-        keyStore.load(new FileInputStream(file), password);
+        File storeFile = ResourceUtils.getFile(file);
+        keyStore.load(new FileInputStream(storeFile), password);
         Certificate certificate = keyStore.getCertificate(alias);
         return certificate.getPublicKey();
     }

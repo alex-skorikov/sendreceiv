@@ -32,8 +32,8 @@ public class SendServiceImpl implements SendService {
     @Value(value = "${send.document.url}")
     private String sendDocumentUrl;
 
-    //    @Value(value = "${server.ssl.key-store}")
-    private final String keyStorage = "src/main/resources/sendreceiv.pfx";
+    @Value(value = "${server.key-store}")
+    private String keyStorage;
 
     @Value(value = "${server.key-store-password}")
     private String keyStorePassword;

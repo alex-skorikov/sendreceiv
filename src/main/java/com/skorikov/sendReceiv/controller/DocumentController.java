@@ -25,8 +25,8 @@ public class DocumentController {
 
     @GetMapping("/sign")
     public ResponseEntity<String> signPayload() {
-        PayloadDto payloadDto = new PayloadDto(1L, "Somedata");
-        return sendService.sendDocument(payloadDto);
+        var v = new PayloadDto(1L, "Somedata");
+        return sendService.sendDocument(v);
     }
 
 }

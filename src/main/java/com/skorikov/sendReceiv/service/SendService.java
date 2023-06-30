@@ -1,8 +1,8 @@
 package com.skorikov.sendReceiv.service;
 
-import com.skorikov.sendReceiv.dto.PayloadDto;
+import com.skorikov.sendReceiv.dto.AbstractPayload;
 import org.springframework.http.ResponseEntity;
 
 public interface SendService {
-    ResponseEntity<String> sendDocument(PayloadDto document);
+    ResponseEntity<String> sendDocument(AbstractPayload document);
 }

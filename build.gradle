@@ -21,8 +21,6 @@ dependencies {
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '3.1.1'
 	implementation 'org.springframework.security:spring-security-test'
 	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
-//	implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.2.1'
-
 	compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.22'
 	annotationProcessor 'org.projectlombok:lombok:1.18.22'
 	testImplementation group: 'junit', name: 'junit', version: '4.13.1'

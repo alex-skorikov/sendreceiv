@@ -15,7 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-public class PayloadDto {
+public class PayloadDto extends AbstractPayload {
     private Long id;
     private String data;
 }

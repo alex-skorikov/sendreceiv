@@ -1,7 +1,7 @@
 package com.skorikov.sendReceiv.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.skorikov.sendReceiv.dto.PayloadDto;
+import com.skorikov.sendReceiv.dto.AbstractPayload;
 import com.skorikov.sendReceiv.service.SendService;
 import com.skorikov.sendReceiv.utils.KeyService;
 import lombok.RequiredArgsConstructor;
@@ -35,30 +35,20 @@ public class SendServiceImpl implements SendService {
     //    @Value(value = "${server.ssl.key-store}")
     private final String keyStorage = "src/main/resources/sendreceiv.pfx";
 
-    @Value(value = "${server.ssl.key-store-password}")
+    @Value(value = "${server.key-store-password}")
     private String keyStorePassword;
 
-    @Value(value = "${server.ssl.key-store-type}")
+    @Value(value = "${server.key-store-type}")
     private String keyStoreType;
 
-    @Value(value = "${server.ssl.key-alias}")
+    @Value(value = "${server.key-alias}")
     private String alias;
 
     @Value(value = "${ssl.signature.algorithm}")
     private String signingAlgorithm;
 
-    static {
-        javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
-                (hostname, sslSession) -> {
-                    if (hostname.equals("localhost")) {
-                        return true;
-                    }
-                    return false;
-                });
-    }
-
     @Override
-    public ResponseEntity<String> sendDocument(PayloadDto document) {
+    public ResponseEntity<String> sendDocument(AbstractPayload document) {
         restTemplate.getMessageConverters().add(new FormHttpMessageConverter());
         restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 

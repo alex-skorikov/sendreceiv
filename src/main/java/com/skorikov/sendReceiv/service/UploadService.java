@@ -1,11 +1,10 @@
 package com.skorikov.sendReceiv.service;
 
-import com.skorikov.sendReceiv.dto.PayloadDto;
+import com.skorikov.sendReceiv.dto.AbstractPayload;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 
 public interface UploadService {
-    ResponseEntity<String> uploadDocument(HttpServletRequest request, PayloadDto payload);
+    ResponseEntity<String> uploadDocument(HttpServletRequest request, AbstractPayload payload);
 
 }

@@ -1,7 +1,7 @@
 package com.skorikov.sendReceiv.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.skorikov.sendReceiv.dto.PayloadDto;
+import com.skorikov.sendReceiv.dto.AbstractPayload;
 import com.skorikov.sendReceiv.service.UploadService;
 import com.skorikov.sendReceiv.utils.KeyService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,13 +25,13 @@ public class UploadServiceImpl implements UploadService {
     private final String keyStorage = "src/main/resources/sendreceiv.pfx";
     private final ObjectMapper objectMapper;
 
-    @Value(value = "${server.ssl.key-store-password}")
+    @Value(value = "${server.key-store-password}")
     private String keyStorePassword;
 
-    @Value(value = "${server.ssl.key-store-type}")
+    @Value(value = "${server.key-store-type}")
     private String keyStoreType;
 
-    @Value(value = "${server.ssl.key-alias}")
+    @Value(value = "${server.key-alias}")
     private String alias;
 
     @Value(value = "${ssl.signature.algorithm}")
@@ -41,7 +41,7 @@ public class UploadServiceImpl implements UploadService {
     private String hashingAlgorithm;
 
     @Override
-    public ResponseEntity<String> uploadDocument(HttpServletRequest request, PayloadDto payloadDto) {
+    public ResponseEntity<String> uploadDocument(HttpServletRequest request, AbstractPayload payloadDto) {
         try {
             String sign = request.getHeader("sign");
             // дешифрование подписи

@@ -6,7 +6,6 @@ import com.skorikov.sendReceiv.service.SendService;
 import com.skorikov.sendReceiv.utils.KeyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,11 +28,8 @@ public class SendServiceImpl implements SendService {
     private final ObjectMapper objectMapper;
     private final KeyService keyService;
 
-    @Value(value = "${send.document.url}")
-    private String sendDocumentUrl;
-
     @Override
-    public ResponseEntity<String> sendDocument(AbstractPayload document) {
+    public ResponseEntity<String> sendDocument(String url, AbstractPayload document) {
         restTemplate.getMessageConverters().add(new FormHttpMessageConverter());
         restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
@@ -51,13 +47,13 @@ public class SendServiceImpl implements SendService {
             headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
             HttpEntity<String> request = new HttpEntity<>(payload, headers);
-            ResponseEntity<String> exchange = restTemplate.exchange(sendDocumentUrl, HttpMethod.POST, request, String.class);
+            ResponseEntity<String> exchange = restTemplate.exchange(url, HttpMethod.POST, request, String.class);
             HttpStatusCode statusCode = exchange.getStatusCode();
             String body = exchange.getBody();
             return ResponseEntity.status(statusCode).contentType(MediaType.APPLICATION_JSON).body(body);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body("Can't send document.");
+            return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON).body("Can't upload document.");
         }
     }
 }

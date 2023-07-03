@@ -26,7 +26,7 @@ public class ThroughTest {
     int port;
 
     @Test
-    public void signTest() {
+    public void whenSendDocumentThenUpload() {
         String url = "http://localhost:" + port + "/upload";
         PayloadDto payload = new PayloadDto(1L, "Data");
         ResponseEntity<String> response = sendService.sendDocument(url, payload);
@@ -35,7 +35,7 @@ public class ThroughTest {
     }
 
     @Test
-    public void signTest2() {
+    public void whenSendDocumentWithWrongURLThenNotUpload() {
         String wrongUrl = "http://localhost:8080/upload";
         PayloadDto payload = new PayloadDto(1L, "Data");
         ResponseEntity<String> response = sendService.sendDocument(wrongUrl, payload);

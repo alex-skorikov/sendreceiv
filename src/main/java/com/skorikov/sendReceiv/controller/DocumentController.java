@@ -1,7 +1,6 @@
 package com.skorikov.sendReceiv.controller;
 
 import com.skorikov.sendReceiv.dto.PayloadDto;
-import com.skorikov.sendReceiv.service.SendService;
 import com.skorikov.sendReceiv.service.UploadService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class DocumentController {
 
     private final UploadService uploadService;
-    private final SendService sendService;
 
     @PostMapping("/upload")
     public ResponseEntity<String> getPayload(HttpServletRequest request, @RequestBody PayloadDto payload) {

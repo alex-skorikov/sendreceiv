@@ -19,6 +19,7 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '3.1.1'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '3.1.1'
 	implementation 'org.springframework.security:spring-security-test'
 	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.14'
 	compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.22'

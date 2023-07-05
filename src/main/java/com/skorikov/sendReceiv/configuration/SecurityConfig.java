@@ -23,7 +23,7 @@ public class SecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers(HttpMethod.POST, "/upload")
+                        .requestMatchers(HttpMethod.POST, "/upload/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated()

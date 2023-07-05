@@ -49,4 +49,15 @@ public class ThroughTest {
         assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST));
         assertThat(response.getBody(), is("Can't upload document."));
     }
+
+    @Test
+    public void whenSendDocumentWithWrongKeyThenNotUpload() throws JsonProcessingException {
+        String url = "http://localhost:" + port + "/upload";
+        PayloadDto payload = new PayloadDto(1L, "Data");
+        PayloadDto wrongPayload = new PayloadDto(1L, "Wrong Data");
+        String wrongKey = signDocumentService.getStringKeyEncode(wrongPayload);
+        ResponseEntity<String> response = sendService.sendDocument(url, payload, wrongKey);
+        assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST));
+        assertThat(response.getBody(), is("Can't upload document."));
+    }
 }

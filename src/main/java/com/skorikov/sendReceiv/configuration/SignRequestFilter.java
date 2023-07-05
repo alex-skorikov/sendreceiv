@@ -2,8 +2,7 @@ package com.skorikov.sendReceiv.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skorikov.sendReceiv.configuration.wrapper.RequestWrapper;
-import com.skorikov.sendReceiv.dto.PayloadDto;
-import com.skorikov.sendReceiv.utils.KeyService;
+import com.skorikov.sendReceiv.service.Signature;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,15 +15,13 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Base64;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class SignRequestFilter extends OncePerRequestFilter {
 
-    private final ObjectMapper objectMapper;
-    private final KeyService keyService;
+    private final Signature.VerifyDocument verifyDocumentService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -32,16 +29,9 @@ public class SignRequestFilter extends OncePerRequestFilter {
 
         String sign = wrapper.getHeader("sign");
         byte[] body = StreamUtils.copyToByteArray(wrapper.getInputStream());
-        PayloadDto payloadDto = new ObjectMapper().readValue(body, PayloadDto.class);
-        String payload = objectMapper.writeValueAsString(payloadDto);
 
-        byte[] bytes = payload.getBytes();
-        byte[] decodeKey = Base64.getDecoder().decode(sign);
-        byte[] decipher = keyService.decipher(bytes);
-
-        boolean verifyDecipher = keyService.verifyDecipher(bytes, decipher);
-        boolean verifySign = keyService.verifySign(bytes, decodeKey);
-        if (!verifySign || !verifyDecipher) {
+        boolean verifyDocument = verifyDocumentService.verifyDocument(sign, body);
+        if (!verifyDocument) {
             log.error("Can't verify upload document.");
 
             response.resetBuffer();

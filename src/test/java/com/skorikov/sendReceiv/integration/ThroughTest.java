@@ -1,7 +1,9 @@
 package com.skorikov.sendReceiv.integration;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.skorikov.sendReceiv.dto.PayloadDto;
 import com.skorikov.sendReceiv.service.SendService;
+import com.skorikov.sendReceiv.service.Signature;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,23 +24,28 @@ public class ThroughTest {
     @Autowired
     private SendService sendService;
 
+    @Autowired
+    private Signature.SignDocument signDocumentService;
+
     @LocalServerPort
     int port;
 
     @Test
-    public void whenSendDocumentThenUpload() {
+    public void whenSendDocumentThenUpload() throws JsonProcessingException {
         String url = "http://localhost:" + port + "/upload";
         PayloadDto payload = new PayloadDto(1L, "Data");
-        ResponseEntity<String> response = sendService.sendDocument(url, payload);
+        String stringKeyEncode = signDocumentService.getStringKeyEncode(payload);
+        ResponseEntity<String> response = sendService.sendDocument(url, payload, stringKeyEncode);
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
         assertThat(response.getBody(), is("Upload document."));
     }
 
     @Test
-    public void whenSendDocumentWithWrongURLThenNotUpload() {
+    public void whenSendDocumentWithWrongURLThenNotUpload() throws JsonProcessingException {
         String wrongUrl = "http://localhost:8080/upload";
         PayloadDto payload = new PayloadDto(1L, "Data");
-        ResponseEntity<String> response = sendService.sendDocument(wrongUrl, payload);
+        String stringKeyEncode = signDocumentService.getStringKeyEncode(payload);
+        ResponseEntity<String> response = sendService.sendDocument(wrongUrl, payload, stringKeyEncode);
         assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST));
         assertThat(response.getBody(), is("Can't upload document."));
     }

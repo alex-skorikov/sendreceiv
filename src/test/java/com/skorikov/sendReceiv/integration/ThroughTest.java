@@ -60,4 +60,14 @@ public class ThroughTest {
         assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST));
         assertThat(response.getBody(), is("Can't upload document."));
     }
+
+    @Test
+    public void uploadWithOutFilterTest() throws JsonProcessingException {
+        String url = "http://localhost:" + port + "/with-out-filter";
+        PayloadDto wrongPayload = new PayloadDto(1L, "Wrong Data");
+        String wrongKey = "wrong key";
+        ResponseEntity<String> response = sendService.sendDocument(url, wrongPayload, wrongKey);
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        assertThat(response.getBody(), is("Upload without filter."));
+    }
 }

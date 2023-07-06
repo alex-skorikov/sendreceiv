@@ -19,4 +19,10 @@ public class DocumentController {
     public ResponseEntity<String> getPayload(HttpServletRequest request, @RequestBody PayloadDto payload) {
         return uploadService.uploadDocument(request, payload);
     }
+
+    // For test
+    @PostMapping("/with-out-filter")
+    public ResponseEntity<String> getPayloadWithOutFilter(HttpServletRequest request, @RequestBody PayloadDto payload) {
+        return ResponseEntity.ok().body("Upload without filter.");
+    }
 }
